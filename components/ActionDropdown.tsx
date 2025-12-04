@@ -25,7 +25,11 @@ import Link from "next/link";
 import { constructFileUrl } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { renameFile, updateFileUsers } from "@/lib/actions/file.actions";
+import {
+  deleteFile,
+  renameFile,
+  updateFileUsers,
+} from "@/lib/actions/file.actions";
 import { usePathname } from "next/navigation";
 import { FileDetails, ShareInput } from "@/components/ActionsModalContent";
 
@@ -54,6 +58,8 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
       rename: () =>
         renameFile({ fileId: file.$id, name, extension: file.extension, path }),
       share: () => updateFileUsers({ fileId: file.$id, emails, path }),
+      delete: () =>
+        deleteFile({ fileId: file.$id, bucketFileId: file.bucketFileId, path }),
     };
     success = await actions[action.value as keyof typeof actions]();
     if (success) closeAllModals();
@@ -96,6 +102,12 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
             />
           )}
           {value === "details" && <FileDetails file={file} />}
+          {value === "delete" && (
+            <p className="delete-confirmation">
+              Are you sure want to delete {` `}
+              <span className="delete-file-name">{file.name}</span>?
+            </p>
+          )}
         </DialogHeader>
         {["rename", "delete", "share"].includes(value) && (
           <DialogFooter className="flex flex-col gap-3 md:flex-row">
